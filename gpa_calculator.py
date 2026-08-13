@@ -1,284 +1,370 @@
-# Yared Nega
-# August 2026
-# Final Project - Cumulative GPA Calculator
-# Built with tkinter (included in every standard Python install)
-# No third-party libraries required - runs in IDLE or any Python 3 environment
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cumulative GPA Calculator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-import tkinter as tk
-from tkinter import messagebox
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
 
-FILE_NAME = "grades.txt"
+    nav {
+      background: #1a237e;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-GRADE_POINTS = {
-    "A+": 4.0, "A": 4.0, "A-": 3.7,
-    "B+": 3.3, "B": 3.0, "B-": 2.7,
-    "C+": 2.3, "C": 2.0, "C-": 1.7,
-    "D+": 1.3, "D": 1.0, "D-": 0.7,
-    "F":  0.0
-}
+    nav .logo {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
 
-# ── Course Class ─────────────────────────────────────────────────────────────
-class Course:
-    """Represents a single college course with a name, grade, and credit hours."""
+    nav a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
 
-    def __init__(self, name, grade, credits):
-        self.name    = name
-        self.grade   = grade.upper()
-        self.credits = int(credits)
+    nav a:hover { color: white; }
 
-    def gradePoints(self):
-        """Returns the total quality points earned (grade value x credits)."""
-        return GRADE_POINTS.get(self.grade, 0.0) * self.credits
+    .hero {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
+      color: white;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
 
-    def __str__(self):
-        """Returns a comma-separated string for file storage."""
-        return f"{self.name},{self.grade},{self.credits}"
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
 
+    .hero p {
+      font-size: 1.15rem;
+      opacity: 0.85;
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
 
-# ── GPA Calculator GUI Class ─────────────────────────────────────────────────
-class GPACalculator:
-    """A tkinter GUI application that tracks multiple courses and
-    computes cumulative GPA. Saves and loads data from a text file."""
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-    def __init__(self, root):
-        self.root    = root
-        self.courses = []
-        self.root.title("Cumulative GPA Calculator")
-        self.root.resizable(False, False)
-        self._buildWidgets()
+    .btn-download {
+      background: white;
+      color: #1a237e;
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
 
-    # ── Build all widgets ────────────────────────────────────────────────────
-    def _buildWidgets(self):
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
 
-        # ── Title banner ─────────────────────────────────────────────────────
-        tk.Label(self.root, text="Cumulative GPA Calculator",
-                 font=("Helvetica", 16, "bold"),
-                 bg="#1a237e", fg="white",
-                 padx=10, pady=8).grid(row=0, column=0, columnspan=4,
-                                       sticky="we")
+    .btn-github {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.6);
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
 
-        # ── Input frame ──────────────────────────────────────────────────────
-        inputFrame = tk.LabelFrame(self.root, text="Add a Course",
-                                   font=("Helvetica", 10, "bold"),
-                                   padx=10, pady=8)
-        inputFrame.grid(row=1, column=0, columnspan=4,
-                        padx=12, pady=8, sticky="we")
+    .btn-github:hover {
+      border-color: white;
+      background: rgba(255,255,255,0.1);
+    }
 
-        tk.Label(inputFrame, text="Course Name:").grid(row=0, column=0, sticky="e")
-        self.nameVar = tk.StringVar()
-        tk.Entry(inputFrame, textvariable=self.nameVar,
-                 width=22).grid(row=0, column=1, padx=6, pady=4)
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      font-size: 0.78rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.04em;
+    }
 
-        tk.Label(inputFrame, text="Grade:").grid(row=0, column=2, sticky="e")
-        self.gradeVar = tk.StringVar()
-        gradeOptions = ["A+","A","A-","B+","B","B-",
-                        "C+","C","C-","D+","D","D-","F"]
-        self.gradeMenu = tk.OptionMenu(inputFrame, self.gradeVar, *gradeOptions)
-        self.gradeVar.set("A")
-        self.gradeMenu.config(width=4)
-        self.gradeMenu.grid(row=0, column=3, padx=6)
+    .features {
+      max-width: 900px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
 
-        tk.Label(inputFrame, text="Credit Hours:").grid(row=1, column=0, sticky="e")
-        self.creditsVar = tk.StringVar()
-        tk.Entry(inputFrame, textvariable=self.creditsVar,
-                 width=6).grid(row=1, column=1, padx=6, pady=4, sticky="w")
+    .features h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      color: #1a1a1a;
+    }
 
-        tk.Button(inputFrame, text="Add Course",
-                  bg="#1a237e", fg="white", width=12,
-                  command=self.addCourse).grid(row=1, column=2,
-                                               columnspan=2, padx=6)
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
 
-        # ── Course list display ───────────────────────────────────────────────
-        listFrame = tk.LabelFrame(self.root, text="Courses",
-                                  font=("Helvetica", 10, "bold"),
-                                  padx=10, pady=6)
-        listFrame.grid(row=2, column=0, columnspan=4,
-                       padx=12, pady=4, sticky="we")
+    .feature-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #e8e8e3;
+    }
 
-        self.listbox = tk.Listbox(listFrame, width=58, height=10,
-                                  font=("Courier", 10))
-        self.listbox.pack(side="left", fill="both")
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.75rem;
+    }
 
-        scrollbar = tk.Scrollbar(listFrame, orient="vertical",
-                                 command=self.listbox.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.listbox.config(yscrollcommand=scrollbar.set)
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #1a1a1a;
+    }
 
-        # ── Buttons row ───────────────────────────────────────────────────────
-        btnFrame = tk.Frame(self.root)
-        btnFrame.grid(row=3, column=0, columnspan=4, pady=6)
+    .feature-card p {
+      font-size: 0.88rem;
+      color: #666;
+      line-height: 1.6;
+    }
 
-        buttons = [
-            ("Calculate GPA",  "#2e7d32", self.calculateGPA),
-            ("Remove Selected","#b71c1c", self.removeSelected),
-            ("Save to File",   "#e65100", self.saveToFile),
-            ("Load from File", "#4527a0", self.loadFromFile),
-            ("Clear All",      "#37474f", self.clearAll),
-        ]
-        for label, color, cmd in buttons:
-            tk.Button(btnFrame, text=label, bg=color, fg="white",
-                      width=14, command=cmd).pack(side="left", padx=4)
+    .install {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e8e8e3;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+      padding: 2rem 2.5rem;
+    }
 
-        # ── GPA result display ────────────────────────────────────────────────
-        resultFrame = tk.Frame(self.root, pady=6)
-        resultFrame.grid(row=4, column=0, columnspan=4)
+    .install h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
 
-        tk.Label(resultFrame, text="Cumulative GPA:",
-                 font=("Helvetica", 13, "bold")).pack(side="left", padx=8)
+    .step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
 
-        self.gpaVar = tk.StringVar(value="---")
-        tk.Label(resultFrame, textvariable=self.gpaVar,
-                 font=("Helvetica", 22, "bold"),
-                 fg="#1a237e", width=6).pack(side="left")
+    .step-num {
+      background: #1a237e;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
 
-        self.letterVar = tk.StringVar(value="")
-        tk.Label(resultFrame, textvariable=self.letterVar,
-                 font=("Helvetica", 13),
-                 fg="#555").pack(side="left", padx=4)
+    .step-content p {
+      font-size: 0.95rem;
+      color: #333;
+      line-height: 1.6;
+    }
 
-        # ── Status bar ────────────────────────────────────────────────────────
-        self.statusVar = tk.StringVar(value="Ready. Add courses to get started.")
-        tk.Label(self.root, textvariable=self.statusVar,
-                 anchor="w", relief="sunken",
-                 font=("Helvetica", 9), fg="#333",
-                 padx=6).grid(row=5, column=0, columnspan=4,
-                               sticky="we", padx=0, pady=(4,0))
+    code {
+      background: #f0f0eb;
+      border: 1px solid #e0e0da;
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.85rem;
+      color: #1a237e;
+    }
 
-    # ── Command methods ───────────────────────────────────────────────────────
-    def addCourse(self):
-        """Validates inputs and adds a Course object to the list."""
-        name    = self.nameVar.get().strip()
-        grade   = self.gradeVar.get().strip().upper()
-        credits = self.creditsVar.get().strip()
+    .formula {
+      background: #f8f8f5;
+      border-left: 4px solid #1a237e;
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+    }
 
-        if name == "":
-            messagebox.showerror("Input Error", "Please enter a course name.")
-            return
-        if not credits.isdigit() or int(credits) <= 0:
-            messagebox.showerror("Input Error",
-                                 "Credit hours must be a positive whole number (e.g. 3).")
-            return
+    .formula h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #1a237e;
+    }
 
-        course = Course(name, grade, credits)
-        self.courses.append(course)
-        self._refreshListbox()
-        self.nameVar.set("")
-        self.creditsVar.set("")
-        self.statusVar.set(f"Added: {name}  |  Grade: {grade}  |  Credits: {credits}")
+    .formula p {
+      font-size: 0.92rem;
+      color: #444;
+      line-height: 1.8;
+      font-family: "SF Mono", monospace;
+    }
 
-    def calculateGPA(self):
-        """Computes cumulative GPA weighted by credit hours."""
-        if len(self.courses) == 0:
-            messagebox.showwarning("No Courses",
-                                   "Add at least one course before calculating.")
-            return
+    footer {
+      background: #1a237e;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.88rem;
+    }
 
-        totalPoints  = sum(c.gradePoints() for c in self.courses)
-        totalCredits = sum(c.credits       for c in self.courses)
-        gpa = totalPoints / totalCredits if totalCredits > 0 else 0.0
+    footer a { color: rgba(255,255,255,0.9); }
 
-        self.gpaVar.set(f"{gpa:.2f}")
-        self.letterVar.set(f"({self._letterGrade(gpa)})")
-        self.statusVar.set(
-            f"GPA calculated across {len(self.courses)} course(s) "
-            f"and {totalCredits} total credit hour(s)."
-        )
+    .section-label {
+      text-align: center;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
 
-    def removeSelected(self):
-        """Removes the course selected in the listbox."""
-        selection = self.listbox.curselection()
-        if not selection:
-            messagebox.showinfo("Nothing Selected",
-                                "Click a course in the list to select it, then Remove.")
-            return
-        idx = selection[0]
-        removed = self.courses.pop(idx)
-        self._refreshListbox()
-        self.statusVar.set(f"Removed: {removed.name}")
+<nav>
+  <span class="logo">📊 GPA Calculator</span>
+  <a href="https://github.com/Negfellow/gpa-calculator" target="_blank">GitHub →</a>
+</nav>
 
-    def saveToFile(self):
-        """Writes all courses to grades.txt (one course per line)."""
-        if len(self.courses) == 0:
-            messagebox.showwarning("Nothing to Save", "Add courses before saving.")
-            return
-        f = open(FILE_NAME, "w")
-        for course in self.courses:
-            f.write(str(course) + "\n")
-        f.close()
-        self.statusVar.set(
-            f"Saved {len(self.courses)} course(s) to '{FILE_NAME}'."
-        )
+<section class="hero">
+  <div class="badge">Python · tkinter · No install required</div>
+  <h1>Cumulative GPA Calculator</h1>
+  <p>A desktop app for college students to track courses and calculate their weighted GPA on the standard 4.0 scale.</p>
+  <div class="btn-group">
+    <a class="btn-download" href="https://raw.githubusercontent.com/Negfellow/gpa-calculator/main/gpa_calculator.py" download="gpa_calculator.py">
+      ⬇ Download gpa_calculator.py
+    </a>
+    <a class="btn-github" href="https://github.com/Negfellow/gpa-calculator" target="_blank">
+      View on GitHub
+    </a>
+  </div>
+</section>
 
-    def loadFromFile(self):
-        """Reads courses from grades.txt and adds them to the current list."""
-        try:
-            f = open(FILE_NAME, "r")
-            lines = f.readlines()
-            f.close()
-        except FileNotFoundError:
-            messagebox.showerror("File Not Found",
-                                 f"'{FILE_NAME}' was not found.\n"
-                                 "Save your courses first to create the file.")
-            return
+<section class="features">
+  <p class="section-label">Features</p>
+  <h2>Everything you need to track your GPA</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">➕</div>
+      <h3>Add multiple courses</h3>
+      <p>Enter course name, select your letter grade from a dropdown, and add credit hours.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧮</div>
+      <h3>Weighted GPA calculation</h3>
+      <p>Calculates cumulative GPA weighted by credit hours across all your courses instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💾</div>
+      <h3>Save and load</h3>
+      <p>Save your courses to a <code>grades.txt</code> file and reload them any time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✅</div>
+      <h3>No installation needed</h3>
+      <p>Built with Python's built-in tkinter library. Runs in IDLE or any Python 3 environment.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔤</div>
+      <h3>Full +/- grade scale</h3>
+      <p>Supports A+ through F including all plus and minus grades on the standard 4.0 scale.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛡</div>
+      <h3>Input validation</h3>
+      <p>Clear error messages for invalid inputs so your GPA is always calculated correctly.</p>
+    </div>
+  </div>
+</section>
 
-        count = 0
-        for line in lines:
-            parts = line.strip().split(",")
-            if len(parts) == 3:
-                name, grade, credits = parts
-                if grade.upper() in GRADE_POINTS and credits.isdigit():
-                    self.courses.append(Course(name, grade, credits))
-                    count += 1
+<section style="padding: 0 2rem; margin-bottom: 4rem;">
+  <p class="section-label">How to run</p>
+  <div class="install">
+    <h2>Get started in 3 steps</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <p>Make sure <strong>Python 3</strong> is installed on your computer. <a href="https://www.python.org/downloads/" target="_blank">Download it here</a> if needed.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <p>Click the <strong>Download</strong> button above to save <code>gpa_calculator.py</code> to your computer.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <p>Open the file in <strong>IDLE</strong> and press <code>F5</code>, or run it from the terminal:<br>
+        <code>python gpa_calculator.py</code></p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        self._refreshListbox()
-        self.statusVar.set(f"Loaded {count} course(s) from '{FILE_NAME}'.")
+<section style="padding: 0 2rem;">
+  <p class="section-label">GPA formula</p>
+  <div class="formula">
+    <h3>How GPA is calculated</h3>
+    <p>
+      GPA = Total Quality Points ÷ Total Credit Hours<br><br>
+      Quality Points per course = Grade Value × Credit Hours<br><br>
+      Example:<br>
+      Math 1314  &nbsp; A &nbsp; 3 credits → 4.0 × 3 = 12.0 pts<br>
+      ENGL 1301  &nbsp; B+ &nbsp; 3 credits → 3.3 × 3 =  9.9 pts<br>
+      ──────────────────────────────────<br>
+      GPA = 21.9 ÷ 6 = 3.65
+    </p>
+  </div>
+</section>
 
-    def clearAll(self):
-        """Clears every course and resets the GPA display."""
-        if len(self.courses) == 0:
-            return
-        confirm = messagebox.askyesno("Clear All",
-                                      "Are you sure you want to remove all courses?")
-        if confirm:
-            self.courses = []
-            self._refreshListbox()
-            self.gpaVar.set("---")
-            self.letterVar.set("")
-            self.statusVar.set("All courses cleared.")
+<footer>
+  <p>Built by <strong style="color:white;">Yared Nega</strong> · Dallas College ITSE-1370 · August 2026</p>
+  <p style="margin-top: 0.5rem;"><a href="https://github.com/Negfellow/gpa-calculator" target="_blank">GitHub Repository</a></p>
+</footer>
 
-    # ── Helpers ───────────────────────────────────────────────────────────────
-    def _refreshListbox(self):
-        """Rebuilds the course listbox from the current courses list."""
-        self.listbox.delete(0, tk.END)
-        if len(self.courses) == 0:
-            self.listbox.insert(tk.END, "  (no courses added yet)")
-            return
-        header = f"  {'#':<4}{'Course':<24}{'Grade':<8}{'Credits':<10}{'Pts'}"
-        self.listbox.insert(tk.END, header)
-        self.listbox.insert(tk.END, "  " + "-" * 50)
-        for i, c in enumerate(self.courses, 1):
-            row = (f"  {i:<4}{c.name:<24}{c.grade:<8}"
-                   f"{c.credits:<10}{c.gradePoints():.1f}")
-            self.listbox.insert(tk.END, row)
-
-    def _letterGrade(self, gpa):
-        """Returns a letter grade label for a given GPA value."""
-        if gpa >= 3.7: return "A / A+"
-        if gpa >= 3.3: return "A-"
-        if gpa >= 3.0: return "B+"
-        if gpa >= 2.7: return "B"
-        if gpa >= 2.3: return "B-"
-        if gpa >= 2.0: return "C+"
-        if gpa >= 1.7: return "C"
-        if gpa >= 1.3: return "C-"
-        if gpa >= 1.0: return "D"
-        return "F"
-
-
-# ── Entry point ───────────────────────────────────────────────────────────────
-def main():
-    root = tk.Tk()
-    app  = GPACalculator(root)
-    root.mainloop()
-
-main()
+</body>
+</html>
