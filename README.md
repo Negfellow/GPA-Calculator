@@ -1,6 +1,6 @@
-##Cumulative GPA Calculator
+## Cumulative GPA Calculator
 
-A desktop GPA calculator built with Python and tkinter as a final project for **ITSE-1370 (Intro to Python)** at Dallas College. No third-party libraries required — runs on any machine with Python 3 installed, including IDLE.
+A desktop GPA calculator built with Python and Tkinter as a final project for **ITSE-1370 (Intro to Python)** at Dallas College. No third-party libraries required — runs on any machine with Python 3 installed, including IDLE.
 
 ---
 
@@ -94,7 +94,8 @@ gpa-calculator/
 - Weighted average calculation
 
 ---
-##Downoad ZIP
+## Download ZIP
+
 Visit https://negfellow.github.io/GPA-Calculator/ to copy the entire repository. 
 
 ## Author
